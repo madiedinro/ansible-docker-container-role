@@ -1,0 +1,12 @@
+#service_repo:
+#service_name:
+#service_image:
+#service_dir:
+
+service_volumes: []
+service_network: bridge
+service_ports: []
+service_env:
+
+#service_deploy_key: ''
+service_key_file: ~/.ssh/id_rsa

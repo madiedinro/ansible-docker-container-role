@@ -1,0 +1,45 @@
+---
+- name: Copying deploy key
+  copy:
+    src: '{{service_deploy_key}}'
+    dest: '{{service_key_file}}'
+    owner: '{{ansible_user}}'
+    mode: 0600
+  when: service_deploy_key is defined
+
+- name: Cloning {{service_name}} service
+  git:
+    repo: '{{service_repo}}'
+    version: HEAD
+    force: yes
+    accept_hostkey: yes
+    key_file: '{{service_deploy_key is defined|ternary(service_key_file, omit)}}'
+    dest: '{{service_dir|default(service_name)}}'
+#    ssh_opts: ' -o StrictHostKeyChecking=no'
+
+- name: Removing deploy key
+  file:
+    path: '{{service_key_file}}'
+    state: absent
+  when: service_deploy_key is defined
+
+- name: Building {{service_name}} service image
+  docker_image:
+    force: yes
+    path: '{{service_dir|default(service_name)}}'
+    name: '{{service_image}}'
+
+- name: Creating {{service_name}} serrvice container
+  docker_container:
+    name: '{{service_name}}'
+    hostname: '{{service_name}}'
+    recreate: yes
+    state: started
+    restart: yes
+    restart_policy: always
+    image: '{{service_image}}'
+    volumes: '{{service_volumes}}'
+    purge_networks: yes
+    networks: [{name: '{{service_network}}'}]
+    ports: '{{service_ports}}'
+    env: '{{service_env}}'
