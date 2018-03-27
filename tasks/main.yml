@@ -1,11 +1,4 @@
 ---
-- name: Copying deploy key
-  copy:
-    src: '{{service_deploy_key}}'
-    dest: '{{service_key_file}}'
-    owner: '{{ansible_user}}'
-    mode: 0600
-  when: service_deploy_key is defined
 
 - name: Cloning {{service_name}} service
   git:
@@ -17,11 +10,6 @@
     dest: '{{service_dir|default(service_name)}}'
 #    ssh_opts: ' -o StrictHostKeyChecking=no'
 
-- name: Removing deploy key
-  file:
-    path: '{{service_key_file}}'
-    state: absent
-  when: service_deploy_key is defined
 
 - name: Building {{service_name}} service image
   docker_image:
