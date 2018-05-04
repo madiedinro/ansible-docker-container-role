@@ -1,33 +1,32 @@
 ---
 
-- name: Cloning {{service_name}} service
+- name: Cloning {{drdc_name}} service
   git:
-    repo: '{{service_repo}}'
+    repo: '{{drdc_repo}}'
     version: HEAD
     force: yes
     accept_hostkey: yes
-    key_file: '{{service_deploy_key is defined|ternary(service_key_file, omit)}}'
-    dest: '{{service_dir|default(service_name)}}'
+    dest: '{{drdc_dir|default(drdc_name)}}'
 #    ssh_opts: ' -o StrictHostKeyChecking=no'
 
 
-- name: Building {{service_name}} service image
+- name: Building {{drdc_name}} service image
   docker_image:
     force: yes
-    path: '{{service_dir|default(service_name)}}'
-    name: '{{service_image}}'
+    path: '{{drdc_dir|default(drdc_name)}}'
+    name: '{{drdc_image}}'
 
-- name: Creating {{service_name}} serrvice container
+- name: Creating {{drdc_name}} serrvice container
   docker_container:
-    name: '{{service_name}}'
-    hostname: '{{service_name}}'
+    name: '{{drdc_name}}'
+    hostname: '{{drdc_name}}'
     recreate: yes
     state: started
     restart: yes
     restart_policy: always
-    image: '{{service_image}}'
-    volumes: '{{service_volumes}}'
+    image: '{{drdc_image}}'
+    volumes: '{{drdc_volumes}}'
     purge_networks: yes
-    networks: [{name: '{{service_network}}'}]
-    ports: '{{service_ports}}'
-    env: '{{service_env}}'
+    networks: [{name: '{{drdc_network}}'}]
+    ports: '{{drdc_ports}}'
+    env: '{{drdc_env}}'

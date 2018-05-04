@@ -1,12 +1,10 @@
-#service_repo:
-#service_name:
-#service_image:
-#service_dir:
+#drdc_repo:
+#drdc_name:
+#drdc_dir:
 
-service_volumes: []
-service_network: bridge
-service_ports: []
-service_env:
+drdc_volumes: []
+drdc_network: bridge
+drdc_ports: []
+drdc_env: {}
 
-#service_deploy_key: ''
-service_key_file: ~/.ssh/id_rsa
+drdc_image: "drdc/{{drdc_name}}-image"
