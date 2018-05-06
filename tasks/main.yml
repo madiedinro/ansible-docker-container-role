@@ -7,7 +7,7 @@
     force: yes
     accept_hostkey: yes
     dest: '{{drdc_dir}}'
-  when: drdc_repo
+  when: 'drdc_repo is defined'
 #    ssh_opts: ' -o StrictHostKeyChecking=no'
 
 
@@ -17,15 +17,15 @@
     path: '{{drdc_dir|default(drdc_name)}}'
     name: '{{drdc_image}}'
 
-- name: Creating {{drdc_name}} serrvice container
+- name: Creating {{drdc_name}} service container
   docker_container:
     name: '{{drdc_name}}'
     hostname: '{{drdc_name}}'
-    recreate: yes
+    recreate: '{{drdc_recreate}}'
     state: started
-    pull: true
+    pull: '{{drdc_pull}}'
     restart: yes
-    restart_policy: until-stop
+    restart_policy: '{{drdc_restart_policy}}'
     memory: '{{drdc_memory_limit}}'
     image: '{{drdc_image}}'
     volumes: '{{drdc_volumes}}'
@@ -33,4 +33,4 @@
     networks: '{{drdc_networks}}'
     ports: '{{drdc_ports}}'
     env: '{{drdc_env}}'
-    command: '{{drdc_cmd}}'
+    command: '{{drdc_cmd|default(omit)}}'

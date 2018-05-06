@@ -9,6 +9,10 @@ drdc_networks:
 drdc_ports: []
 #  - "8080:9000"
 drdc_env: {}
+drdc_restart_policy: unless-stopped
 drdc_memory_limit: 500m
 drdc_image: "drdc/{{drdc_name}}-image"
 #drdc_cmd: 
+#for pulled images
+drdc_pull: false
+drdc_recreate: true

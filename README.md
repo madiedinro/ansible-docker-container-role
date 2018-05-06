@@ -11,6 +11,7 @@ Add to ansible playbook following:
       vars:
         drdc_repo: '{{def_api_repo}}'
         drdc_name: '{{def_api_service}}'
+        drdc_dir: '{{imaga souce directory}}'
         drdc_network: '{{def_docker_net_name}}'
         drdc_env: '{{def_env|combine({"KEY": "value"})}}'
         drdc_volumes:
