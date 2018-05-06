@@ -8,16 +8,16 @@ Add to ansible playbook following:
 
     - import_role:
         name: dr.docker-container
-        drdc_repo: https://github.com/....
-        drdc_name: myservice
-        drdc_dir: /home/user/service1
+      vars:
+        drdc_repo: '{{def_api_repo}}'
+        drdc_name: '{{def_api_service}}'
+        drdc_network: '{{def_docker_net_name}}'
+        drdc_env: '{{def_env|combine({"KEY": "value"})}}'
         drdc_volumes:
           - /data
-        drdc_network: bridge
         drdc_ports:
           - "8080:9000"
-        drdc_env: {}
-        tags: ['docker']
+      tags: ['container']
 
 additional (by default computed from main params):
 
