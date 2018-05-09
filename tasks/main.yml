@@ -7,15 +7,15 @@
     force: yes
     accept_hostkey: yes
     dest: '{{drdc_dir}}'
-  when: 'drdc_repo is defined'
+  when: 'drdc_repo is defined and drdc_dir is defined'
 #    ssh_opts: ' -o StrictHostKeyChecking=no'
-
 
 - name: Building {{drdc_name}} service image
   docker_image:
     force: yes
     path: '{{drdc_dir|default(drdc_name)}}'
     name: '{{drdc_image}}'
+  when: 'drdc_dir is defined'
 
 - name: Creating {{drdc_name}} service container
   docker_container:
@@ -29,7 +29,7 @@
     memory: '{{drdc_memory_limit}}'
     image: '{{drdc_image}}'
     volumes: '{{drdc_volumes}}'
-    purge_networks: yes
+    purge_networks: "{{drdc_purge_networks|default(True)}}"
     networks: '{{drdc_networks}}'
     ports: '{{drdc_ports}}'
     env: '{{drdc_env}}'
