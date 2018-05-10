@@ -1,5 +1,13 @@
 ---
 
+- block:
+  - tempfile:
+      state: directory
+      suffix: build
+    register: build
+  - set_fact: drdc_dir={{build.path}}
+  when: 'drdc_repo is defined and drdc_dir is not defined'
+
 - name: Cloning {{drdc_name}} service container
   git:
     repo: '{{drdc_repo}}'
@@ -7,7 +15,7 @@
     force: yes
     accept_hostkey: yes
     dest: '{{drdc_dir}}'
-  when: 'drdc_repo is defined and drdc_dir is defined'
+  when: 'drdc_repo is defined'
 #    ssh_opts: ' -o StrictHostKeyChecking=no'
 
 - name: Building {{drdc_name}} service image
