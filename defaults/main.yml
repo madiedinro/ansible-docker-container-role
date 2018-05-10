@@ -1,5 +1,6 @@
 drdc_name: myservice
 # drdc_dir: '{{drdc_name}}'
+drdc_dir_mode: 0755
 # drdc_repo: https://github....
 drdc_volumes: []
 #   - /data
@@ -9,6 +10,7 @@ drdc_networks:
 drdc_ports: []
 #  - "8080:9000"
 drdc_env: {}
+drdc_build: false
 drdc_restart_policy: unless-stopped
 drdc_memory_limit: 500m
 drdc_image: "drdc/{{drdc_name}}-image"

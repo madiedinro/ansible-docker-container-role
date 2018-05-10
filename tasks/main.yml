@@ -1,4 +1,10 @@
 ---
+- name: "Creating directory if not exists"
+  file:
+    path: "{{drdc_dir}}"
+    state: directory
+    mode: "{{drdc_dir_mode}}"
+  when: 'drdc_dir is defined'
 
 - block:
   - tempfile:
