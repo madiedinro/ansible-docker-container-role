@@ -1,18 +1,22 @@
 ---
+- fail:
+    msg: "Define drdc_name"
+  when: "drdc_name is not defined"
+
 - name: "Creating directory if not exists"
   file:
     path: "{{drdc_dir}}"
     state: directory
     mode: "{{drdc_dir_mode}}"
-  when: 'drdc_dir'
+  when: 'drdc_dir is defined'
 
 - block:
-  - tempfile:
-      state: directory
-      suffix: build
-    register: build
-  - set_fact: drdc_dir={{build.path}}
-  when: 'drdc_repo and not drdc_dir'
+    - tempfile:
+        state: directory
+        suffix: build
+      register: build
+    - set_fact: drdc_dir={{build.path}}
+  when: 'drdc_repo is defined and drdc_dir is not defined'
 
 - name: Cloning {{drdc_name}} service container
   git:
@@ -21,7 +25,7 @@
     force: yes
     accept_hostkey: yes
     dest: '{{drdc_dir}}'
-  when: 'drdc_repo'
+  when: 'drdc_repo is defined'
 #    ssh_opts: ' -o StrictHostKeyChecking=no'
 
 - name: Building {{drdc_name}} service image
@@ -29,7 +33,7 @@
     force: yes
     path: '{{drdc_dir|ternary(drdc_dir, drdc_name)}}'
     name: '{{drdc_image}}'
-  when: 'drdc_dir'
+  when: 'drdc_dir is defined'
 
 - name: Creating {{drdc_name}} service container
   docker_container:
@@ -43,7 +47,7 @@
     memory: '{{drdc_memory_limit}}'
     image: '{{drdc_image}}'
     volumes: '{{drdc_volumes}}'
-    purge_networks: "{{drdc_purge_networks|default(True)}}"
+    purge_networks: "{{drdc_purge_networks}}"
     networks: '{{drdc_networks}}'
     ports: '{{drdc_ports}}'
     env: '{{drdc_env}}'

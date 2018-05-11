@@ -1,10 +1,12 @@
-drdc_name:
-drdc_dir:
+#drdc_name:
+#drdc_dir:
+#drdc_cmd: 
 drdc_dir_mode: 0755
 drdc_repo:
 drdc_volumes: []
 #   - /data
 drdc_network: bridge
+drdc_purge_networks: no
 drdc_networks:
   - {name: '{{drdc_network}}'}
 drdc_ports: []
@@ -13,7 +15,6 @@ drdc_env: {}
 drdc_restart_policy: unless-stopped
 drdc_memory_limit: 500m
 drdc_image: "drdc/{{drdc_name}}-image"
-#drdc_cmd: 
 #for pulled images
 drdc_pull: false
 drdc_recreate: true
