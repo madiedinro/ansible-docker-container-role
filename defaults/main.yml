@@ -1,7 +1,7 @@
-drdc_name: myservice
-# drdc_dir: '{{drdc_name}}'
+drdc_name:
+drdc_dir:
 drdc_dir_mode: 0755
-# drdc_repo: https://github....
+drdc_repo:
 drdc_volumes: []
 #   - /data
 drdc_network: bridge

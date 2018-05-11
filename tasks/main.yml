@@ -4,7 +4,7 @@
     path: "{{drdc_dir}}"
     state: directory
     mode: "{{drdc_dir_mode}}"
-  when: 'drdc_dir is defined'
+  when: 'drdc_dir'
 
 - block:
   - tempfile:
@@ -12,7 +12,7 @@
       suffix: build
     register: build
   - set_fact: drdc_dir={{build.path}}
-  when: 'drdc_repo is defined and drdc_dir is not defined'
+  when: 'drdc_repo and not drdc_dir'
 
 - name: Cloning {{drdc_name}} service container
   git:
@@ -27,9 +27,9 @@
 - name: Building {{drdc_name}} service image
   docker_image:
     force: yes
-    path: '{{drdc_dir|default(drdc_name)}}'
+    path: '{{drdc_dir|ternary(drdc_dir, drdc_name)}}'
     name: '{{drdc_image}}'
-  when: 'drdc_dir is defined'
+  when: 'drdc_dir'
 
 - name: Creating {{drdc_name}} service container
   docker_container:
