@@ -21,7 +21,7 @@
     force: yes
     accept_hostkey: yes
     dest: '{{drdc_dir}}'
-  when: 'drdc_repo is defined'
+  when: 'drdc_repo'
 #    ssh_opts: ' -o StrictHostKeyChecking=no'
 
 - name: Building {{drdc_name}} service image
