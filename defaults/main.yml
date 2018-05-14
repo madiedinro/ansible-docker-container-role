@@ -1,8 +1,8 @@
 #drdc_name:
 #drdc_dir:
 #drdc_cmd: 
+#drdc_repo:
 drdc_dir_mode: 0755
-drdc_repo:
 drdc_volumes: []
 #   - /data
 drdc_network: bridge
