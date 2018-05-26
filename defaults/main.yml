@@ -6,7 +6,7 @@ drdc_dir_mode: 0755
 drdc_volumes: []
 #   - /data
 drdc_network: bridge
-drdc_purge_networks: no
+drdc_purge_networks: yes
 drdc_networks:
   - {name: '{{drdc_network}}'}
 drdc_ports: []
