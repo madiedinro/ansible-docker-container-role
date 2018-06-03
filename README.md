@@ -26,6 +26,10 @@ Add to ansible playbook following:
           - /data:/data:ro
         drdc_ports:
           - "8080:9000"
+        # allocate a pseudo-TTY
+        drdc_tty: no
+        # keep stdin open after a container is launched
+        drdc_interactive: no
       tags: ['container']
 
 
