@@ -42,6 +42,7 @@
     recreate: '{{drdc_recreate}}'
     state: started
     pull: '{{drdc_pull}}'
+    labels: "{{drdc_labels}}"
     restart: yes
     restart_policy: '{{drdc_restart_policy}}'
     memory: '{{drdc_memory_limit}}'

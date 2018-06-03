@@ -22,6 +22,8 @@ Add to ansible playbook following:
         # [net to attach]
         drdc_network: '{{def_docker_net_name}}'
         drdc_env: '{{def_env|combine({"KEY": "value"})}}'
+        # labels dict
+        drdc_labels: {}
         drdc_volumes:
           - /data:/data:ro
         drdc_ports:
