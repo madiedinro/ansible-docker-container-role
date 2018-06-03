@@ -51,4 +51,6 @@
     networks: '{{drdc_networks}}'
     ports: '{{drdc_ports}}'
     env: '{{drdc_env}}'
+    tty: '{{drdc_tty}}'
+    interactive: '{{drdc_interactive}}'
     command: '{{drdc_cmd|default(omit)}}'

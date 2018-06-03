@@ -21,3 +21,5 @@ drdc_recreate: true
 drdc_create_dirs: []
 drdc_templates_dirs: []
 #   {"file.j2", "force": no}
+drdc_tty: no
+drdc_interactive: no
