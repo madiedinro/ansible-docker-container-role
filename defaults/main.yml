@@ -1,5 +1,7 @@
 #drdc_name:
 #drdc_dir:
+# replative path inside dir, ex: /docker
+drdc_rel_path: ""
 #drdc_cmd: 
 #drdc_repo:
 drdc_dir_mode: 0755
@@ -17,10 +19,11 @@ drdc_restart_policy: unless-stopped
 drdc_memory_limit: 500m
 drdc_image: "drdc/{{drdc_name}}-image"
 #for pulled images
-drdc_pull: false
-drdc_recreate: true
+drdc_force: yes
+drdc_recreate: yes
 drdc_create_dirs: []
 drdc_templates_dirs: []
 #   {"file.j2", "force": no}
 drdc_tty: no
 drdc_interactive: no
+drdc_run_container: yes

@@ -15,6 +15,8 @@ Add to ansible playbook following:
         drdc_name: '{{def_api_service}}'
         # [dir for build/dir with sources]
         drdc_dir: '{{image souce directory}}'
+        # image source relative path (inside dir contents)
+        drdc_rel_path: ""
         # [dir mode]
         drdc_dir_mode: 0755
         # [name for pull or name for build]
@@ -32,6 +34,8 @@ Add to ansible playbook following:
         drdc_tty: no
         # keep stdin open after a container is launched
         drdc_interactive: no
+        # run container after build (default yes)
+        drdc_run_container: yes
       tags: ['container']
 
 

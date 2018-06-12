@@ -1,9 +1,15 @@
 ---
+# docs
+# http://docs.ansible.com/ansible/latest/modules/docker_container_module.html
+
 - fail:
     msg: "Define drdc_name"
-  when: "drdc_name is not defined"
+  when: drdc_name is not defined
 
-- name: "Creating directory if not exists"
+- set_fact:
+    drdc_pull: "{{not (drdc_dir is defined or drdc_repo is defined)}}"
+
+- name: "Creating directory for sources"
   file:
     path: "{{drdc_dir}}"
     state: directory
@@ -18,24 +24,28 @@
     - set_fact: drdc_dir={{build.path}}
   when: 'drdc_repo is defined and drdc_dir is not defined'
 
-- name: Cloning {{drdc_name}} service container
+- name: Fetching {{drdc_name}} container source from git
   git:
     repo: '{{drdc_repo}}'
     version: HEAD
-    force: yes
+    force: "{{drdc_force}}"
     accept_hostkey: yes
     dest: '{{drdc_dir}}'
-  when: 'drdc_repo is defined'
-#    ssh_opts: ' -o StrictHostKeyChecking=no'
+  register: git_result
+  when: drdc_repo is defined
 
-- name: Building {{drdc_name}} service image
+- set_fact:
+    img_source_path: "{{drdc_dir + drdc_rel_path}}"
+  when: drdc_dir is defined
+
+- name: Building {{drdc_name}} image
   docker_image:
     force: yes
-    path: '{{drdc_dir|ternary(drdc_dir, drdc_name)}}'
+    pull: '{{drdc_pull}}'
+    path: '{{img_source_path|default(omit)}}'
     name: '{{drdc_image}}'
-  when: 'drdc_dir is defined'
 
-- name: Creating {{drdc_name}} service container
+- name: Creating {{drdc_name}} container
   docker_container:
     name: '{{drdc_name}}'
     hostname: '{{drdc_name}}'
@@ -55,3 +65,4 @@
     tty: '{{drdc_tty}}'
     interactive: '{{drdc_interactive}}'
     command: '{{drdc_cmd|default(omit)}}'
+  when: 'drdc_run_container == True'
