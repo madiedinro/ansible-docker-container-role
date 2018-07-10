@@ -23,6 +23,9 @@ Add to ansible playbook following:
         drdc_image: "drdc/{{drdc_name}}-image"
         # [net to attach]
         drdc_network: '{{def_docker_net_name}}'
+        # optional dict of records for containers /etc/hosts
+        drdc_hosts:
+          host: 177.17.17.99
         drdc_env: '{{def_env|combine({"KEY": "value"})}}'
         # labels dict
         drdc_labels: {}

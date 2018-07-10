@@ -38,22 +38,47 @@
     img_source_path: "{{drdc_dir + drdc_rel_path}}"
   when: drdc_dir is defined
 
+- name: Constructing docker services 
+  docker_service:
+    build: "{{only_scale|ternary(False ,drdc_force)}}"
+    nocache: "{{drdc_nocache}}"
+    project_name: "{{drdc_name}}"
+    definition: "{{drdc_definition|default(omit)}}"
+    recreate: "{{only_scale|ternary('never', drdc_recreate)}}"
+    restarted: "{{only_scale|ternary(False, drdc_restart)}}"
+    scale: "{{drdc_scale}}"
+    timeout: 60
+  when: "drdc_mode == 'compose'" # and scale_mode is not defined
+
+# - debug: var=drdc_scale
+# - name: Scale docker services
+#   docker_service:
+#     project_name: "{{drdc_name}}"
+#     definition: "{{drdc_definition|default(omit)}}"
+#     scale: "{{drdc_scale}}"
+#     timeout: 150
+#   tags: ['never', 'scale']
+#   when: "drdc_mode == 'compose' and scale_mode is defined"
+
 - name: Building {{drdc_name}} image
   docker_image:
-    force: yes
+    force: '{{drdc_force}}'
     pull: '{{drdc_pull}}'
+    nocache: "{{drdc_nocache}}"
     path: '{{img_source_path|default(omit)}}'
     name: '{{drdc_image}}'
+  when: "drdc_mode == 'native'"
 
 - name: Creating {{drdc_name}} container
   docker_container:
     name: '{{drdc_name}}'
     hostname: '{{drdc_name}}'
-    recreate: '{{drdc_recreate}}'
+    recreate: "{{drdc_recreate!='never'}}"
     state: started
     pull: '{{drdc_pull}}'
     labels: "{{drdc_labels}}"
     restart: yes
+    etc_hosts: "{{drdc_hosts|default(omit)}}"
     restart_policy: '{{drdc_restart_policy}}'
     memory: '{{drdc_memory_limit}}'
     image: '{{drdc_image}}'
@@ -65,4 +90,4 @@
     tty: '{{drdc_tty}}'
     interactive: '{{drdc_interactive}}'
     command: '{{drdc_cmd|default(omit)}}'
-  when: 'drdc_run_container == True'
+  when: "drdc_run_container == True and drdc_mode == 'native'"

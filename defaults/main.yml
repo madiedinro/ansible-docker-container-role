@@ -1,29 +1,80 @@
+# Container name
 #drdc_name:
+
+# [dir for build/dir with sources]
 #drdc_dir:
-# replative path inside dir, ex: /docker
+
+# image source relative path (inside dir contents)
 drdc_rel_path: ""
+
+# Override start command
 #drdc_cmd: 
+
+# [git repo with images]
 #drdc_repo:
+
+# optional dict of records for containers /etc/hosts
+#drdc_hosts:
+
+# [dir mode]
 drdc_dir_mode: 0755
+
+# volumes to mount as list
 drdc_volumes: []
-#   - /data
+# - /data:/data:ro
+
+# network mode
 drdc_network: bridge
+
+# purge all networks
 drdc_purge_networks: yes
+
+# [net to attach]
 drdc_networks:
   - {name: '{{drdc_network}}'}
+
+# ports binding
 drdc_ports: []
 #  - "8080:9000"
+
+# Evn vars dict
 drdc_env: {}
+
+# labels dict
 drdc_labels: {}
+
+# when restat
 drdc_restart_policy: unless-stopped
+
+# mem limit for running container
 drdc_memory_limit: 500m
+
+# [name for pull or name for build]
 drdc_image: "drdc/{{drdc_name}}-image"
+
 #for pulled images
 drdc_force: yes
-drdc_recreate: yes
-drdc_create_dirs: []
-drdc_templates_dirs: []
-#   {"file.j2", "force": no}
+
+# recreate service // smart / never / always
+drdc_recreate: smart
+
+drdc_restart: yes
+only_scale: no
+
+# ingnore cached layers
+drdc_nocache: no
+
+# allocate a pseudo-TTY
 drdc_tty: no
+
+# keep stdin open after a container is launched
 drdc_interactive: no
+
+# run container after build (default yes)
 drdc_run_container: yes
+
+# managing mode. native docker methods or use compose
+drdc_mode: native # compose
+
+# scale options: dict with key - service name, value - amount
+drdc_scale: {}
