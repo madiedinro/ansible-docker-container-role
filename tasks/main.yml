@@ -67,6 +67,8 @@
     nocache: "{{drdc_nocache}}"
     path: '{{img_source_path|default(omit)}}'
     name: '{{drdc_image}}'
+    buildargs:
+      RELEASE: "{{git_result.after}}"
   when: "drdc_mode == 'native'"
 
 - name: Creating {{drdc_name}} container
