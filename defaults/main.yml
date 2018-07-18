@@ -13,6 +13,9 @@ drdc_rel_path: ""
 # [git repo with images]
 #drdc_repo:
 
+
+drdc_state: started
+
 # optional dict of records for containers /etc/hosts
 #drdc_hosts:
 
@@ -28,6 +31,10 @@ drdc_network: bridge
 
 # purge all networks
 drdc_purge_networks: yes
+
+
+# bridge / host / ....
+drdc_net_mode: bridge
 
 # [net to attach]
 drdc_networks:
@@ -52,14 +59,19 @@ drdc_memory_limit: 500m
 # [name for pull or name for build]
 drdc_image: "drdc/{{drdc_name}}-image"
 
+drdc_auto_remove: no
+
 #for pulled images
 drdc_force: yes
 
+# docker_service
 # recreate service // smart / never / always
-drdc_recreate: smart
+drdc_recreate: never
 
-drdc_restart: yes
+drdc_restart: no
 only_scale: no
+
+drdc_detach: yes
 
 # ingnore cached layers
 drdc_nocache: no

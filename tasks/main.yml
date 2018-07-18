@@ -70,21 +70,27 @@
   when: "drdc_mode == 'native'"
 
 - name: Creating {{drdc_name}} container
+  vars:
+    hostmod: "{{drdc_net_mode == 'host'}}"
+    nets: "{{ hostmod| ternary([], drdc_networks) }}"
   docker_container:
     name: '{{drdc_name}}'
     hostname: '{{drdc_name}}'
     recreate: "{{drdc_recreate!='never'}}"
-    state: started
+    state: "{{drdc_state}}"
     pull: '{{drdc_pull}}'
+    auto_remove: "{{drdc_auto_remove}}"
     labels: "{{drdc_labels}}"
-    restart: yes
+    restart: "{{drdc_restart}}"
+    detach: "{{drdc_detach}}"
     etc_hosts: "{{drdc_hosts|default(omit)}}"
     restart_policy: '{{drdc_restart_policy}}'
     memory: '{{drdc_memory_limit}}'
     image: '{{drdc_image}}'
     volumes: '{{drdc_volumes}}'
     purge_networks: "{{drdc_purge_networks}}"
-    networks: '{{drdc_networks}}'
+    network_mode: "{{drdc_net_mode}}"
+    networks: "{{nets}}"
     ports: '{{drdc_ports}}'
     env: '{{drdc_env}}'
     tty: '{{drdc_tty}}'
