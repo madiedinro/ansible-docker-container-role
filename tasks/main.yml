@@ -4,10 +4,10 @@
 
 - fail:
     msg: "Define drdc_name"
-  when: drdc_name is not defined
+  when: "drdc_name is not defined"
 
 - set_fact:
-    drdc_pull: "{{not (drdc_dir is defined or drdc_repo is defined)}}"
+    
 
 - name: "Creating directory for sources"
   file:
@@ -24,19 +24,37 @@
     - set_fact: drdc_dir={{build.path}}
   when: 'drdc_repo is defined and drdc_dir is not defined'
 
-- name: Fetching {{drdc_name}} container source from git
-  git:
-    repo: '{{drdc_repo}}'
-    version: HEAD
-    force: "{{drdc_force}}"
-    accept_hostkey: yes
-    dest: '{{drdc_dir}}'
-  register: git_result
-  when: drdc_repo is defined
 
-- set_fact:
-    img_source_path: "{{drdc_dir + drdc_rel_path}}"
-  when: drdc_dir is defined
+- block:
+  - name: Fetching {{drdc_name}} container source from git
+    git:
+      repo: '{{drdc_repo}}'
+      version: HEAD
+      force: "{{drdc_force}}"
+      accept_hostkey: yes
+      dest: '{{drdc_dir}}'
+    register: git_result
+  - set_fact:
+      release_key_git: "{{git_result.after}}"
+  when: "drdc_repo is defined"
+
+- block:
+  - set_fact:
+      img_source_path: "{{drdc_dir + drdc_rel_path}}"
+  - name: Calculating hash
+    stat:
+      path: "{{img_source_path}}"
+      checksum_algorithm: sha256
+    register: dir_checksum
+  - debug:
+      msg:
+        - "{{img_source_path}}"
+        - "{{dir_checksum}}"
+
+  - set_fact:
+      release_key_dir: "{{dir_checksum.stat.version}}"
+  when: "drdc_dir is defined"
+
 
 - name: Constructing docker services 
   docker_service:
@@ -50,6 +68,10 @@
     timeout: 60
   when: "drdc_mode == 'compose'" # and scale_mode is not defined
 
+
+
+
+
 # - debug: var=drdc_scale
 # - name: Scale docker services
 #   docker_service:
@@ -60,7 +82,7 @@
 #   tags: ['never', 'scale']
 #   when: "drdc_mode == 'compose' and scale_mode is defined"
 
-- name: Building {{drdc_name}} image
+- name: "Building {{drdc_name}} image"
   docker_image:
     force: '{{drdc_force}}'
     pull: '{{drdc_pull}}'
@@ -68,10 +90,10 @@
     path: '{{img_source_path|default(omit)}}'
     name: '{{drdc_image}}'
     buildargs:
-      RELEASE: "{{git_result.after}}"
+      RELEASE: "{{release_key_git if release_key_git is defined else release_key_dir }}"
   when: "drdc_mode == 'native'"
 
-- name: Creating {{drdc_name}} container
+- name: "Creating {{drdc_name}} container"
   vars:
     hostmod: "{{drdc_net_mode == 'host'}}"
     nets: "{{ hostmod| ternary([], drdc_networks) }}"

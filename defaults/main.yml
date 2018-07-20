@@ -26,12 +26,11 @@ drdc_dir_mode: 0755
 drdc_volumes: []
 # - /data:/data:ro
 
-# network mode
-drdc_network: bridge
-
 # purge all networks
 drdc_purge_networks: yes
 
+# network mode
+drdc_network: bridge
 
 # bridge / host / ....
 drdc_net_mode: bridge
