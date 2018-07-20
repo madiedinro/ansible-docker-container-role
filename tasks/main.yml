@@ -46,11 +46,7 @@
       path: "{{img_source_path}}"
       checksum_algorithm: sha256
     register: dir_checksum
-  - debug:
-      msg:
-        - "{{img_source_path}}"
-        - "{{dir_checksum}}"
-
+    
   - set_fact:
       release_key_dir: "{{dir_checksum.stat.version}}"
   when: "drdc_dir is defined"
@@ -67,9 +63,6 @@
     scale: "{{drdc_scale}}"
     timeout: 60
   when: "drdc_mode == 'compose'" # and scale_mode is not defined
-
-
-
 
 
 # - debug: var=drdc_scale
