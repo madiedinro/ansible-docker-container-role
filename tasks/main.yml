@@ -6,8 +6,6 @@
     msg: "Define drdc_name"
   when: "drdc_name is not defined"
 
-- set_fact:
-    
 
 - name: "Creating directory for sources"
   file:
@@ -15,6 +13,7 @@
     state: directory
     mode: "{{drdc_dir_mode}}"
   when: 'drdc_dir is defined'
+
 
 - block:
     - tempfile:
@@ -37,6 +36,7 @@
   - set_fact:
       release_key_git: "{{git_result.after}}"
   when: "drdc_repo is defined"
+
 
 - block:
   - set_fact:
@@ -75,6 +75,7 @@
 #   tags: ['never', 'scale']
 #   when: "drdc_mode == 'compose' and scale_mode is defined"
 
+
 - name: "Building {{drdc_name}} image"
   docker_image:
     force: '{{drdc_force}}'
@@ -83,8 +84,11 @@
     path: '{{img_source_path|default(omit)}}'
     name: '{{drdc_image}}'
     buildargs:
-      RELEASE: "{{release_key_git if release_key_git is defined else release_key_dir }}"
+      RELEASE: 
+  vars:
+    calc_release: "{{release_key_git|default(None) or release_key_dir|default(None) or 'latest' }}"
   when: "drdc_mode == 'native'"
+
 
 - name: "Creating {{drdc_name}} container"
   vars:
