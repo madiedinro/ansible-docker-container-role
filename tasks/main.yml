@@ -2,9 +2,7 @@
 # docs
 # http://docs.ansible.com/ansible/latest/modules/docker_container_module.html
 
-- fail:
-    msg: "Define drdc_name"
-  when: "drdc_name is not defined"
+- assert: { that: "drdc_name is defined" }
 
 
 - name: "Creating directory for sources"
@@ -12,7 +10,7 @@
     path: "{{drdc_dir}}"
     state: directory
     mode: "{{drdc_dir_mode}}"
-  when: 'drdc_dir is defined'
+  when: "drdc_dir != ''"
 
 
 - block:
@@ -21,7 +19,7 @@
         suffix: build
       register: build
     - set_fact: drdc_dir={{build.path}}
-  when: 'drdc_repo is defined and drdc_dir is not defined'
+  when: "drdc_repo != '' and drdc_dir == ''"
 
 
 - block:
@@ -35,7 +33,7 @@
     register: git_result
   - set_fact:
       release_key_git: "{{git_result.after}}"
-  when: "drdc_repo is defined"
+  when: "drdc_repo != ''"
 
 
 - block:
@@ -49,7 +47,7 @@
     
   - set_fact:
       release_key_dir: "{{dir_checksum.stat.version}}"
-  when: "drdc_dir is defined"
+  when: "drdc_dir != ''"
 
 
 - name: Constructing docker services 

@@ -1,23 +1,24 @@
 # Container name
-#drdc_name:
+drdc_name: ""
 
 # [dir for build/dir with sources]
-#drdc_dir:
+drdc_dir: ""
 
 # image source relative path (inside dir contents)
 drdc_rel_path: ""
 
 # Override start command
-#drdc_cmd: 
+drdc_cmd: ""
 
 # [git repo with images]
-#drdc_repo:
+drdc_repo: ""
 
 
 drdc_state: started
 
 # optional dict of records for containers /etc/hosts
-#drdc_hosts:
+drdc_hosts: {}
+  # host: 177.17.17.99
 
 # [dir mode]
 drdc_dir_mode: 0755
