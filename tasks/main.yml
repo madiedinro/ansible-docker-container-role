@@ -2,24 +2,26 @@
 # docs
 # http://docs.ansible.com/ansible/latest/modules/docker_container_module.html
 
-- assert: { that: "drdc_name is defined" }
+- assert: { that: "drdc_name != ''" }
+
+
+- set_fact:
+    _git_result_after: ""
+    _release_dir_key: ""
+    _release_key: ""
+
+- debug: var=_img_source
+- debug: var=_release_key_git
+- debug: var=_drdc_dir
+- debug: var=drdc_dir
 
 
 - name: "Creating directory for sources"
   file:
-    path: "{{drdc_dir}}"
+    path: "{{ drdc_use_dir }}"
     state: directory
-    mode: "{{drdc_dir_mode}}"
-  when: "drdc_dir != ''"
-
-
-- block:
-    - tempfile:
-        state: directory
-        suffix: build
-      register: build
-    - set_fact: drdc_dir={{build.path}}
-  when: "drdc_repo != '' and drdc_dir == ''"
+    mode: "{{ drdc_dir_mode }}"
+  when: "drdc_pull == False"
 
 
 - block:
@@ -29,90 +31,96 @@
       version: HEAD
       force: "{{drdc_force}}"
       accept_hostkey: yes
-      dest: '{{drdc_dir}}'
-    register: git_result
+      dest: '{{drdc_use_dir}}'
+    register: _git_result
   - set_fact:
-      release_key_git: "{{git_result.after}}"
+      _release_key: "{{_git_result.after}}"
   when: "drdc_repo != ''"
 
 
 - block:
-  - set_fact:
-      img_source_path: "{{drdc_dir + drdc_rel_path}}"
   - name: Calculating hash
     stat:
-      path: "{{img_source_path}}"
+      path: "{{drdc_use_dir}}"
       checksum_algorithm: sha256
-    register: dir_checksum
-    
+    register: _dir_stat
   - set_fact:
-      release_key_dir: "{{dir_checksum.stat.version}}"
-  when: "drdc_dir != ''"
+      _release_key: "{{_dir_stat.stat.version}}"
+  when: "drdc_pull == False and drdc_repo == ''"
 
 
-- name: Constructing docker services 
-  docker_service:
-    build: "{{only_scale|ternary(False ,drdc_force)}}"
-    nocache: "{{drdc_nocache}}"
-    project_name: "{{drdc_name}}"
-    definition: "{{drdc_definition|default(omit)}}"
-    recreate: "{{only_scale|ternary('never', drdc_recreate)}}"
-    restarted: "{{only_scale|ternary(False, drdc_restart)}}"
-    scale: "{{drdc_scale}}"
-    timeout: 60
-  when: "drdc_mode == 'compose'" # and scale_mode is not defined
+# - block:
+#   - name: Constructing docker services 
+#     docker_service:
+#       build: "{{only_scale|ternary(False ,drdc_force)}}"
+#       nocache: "{{drdc_nocache}}"
+#       project_name: "{{drdc_name}}"
+#       definition: "{{drdc_definition|default(omit)}}"
+#       recreate: "{{only_scale|ternary('never', drdc_recreate)}}"
+#       restarted: "{{only_scale|ternary(False, drdc_restart)}}"
+#       scale: "{{drdc_scale}}"
+#       timeout: 60
+#     when: "drdc_mode == 'compose'" # and scale_mode is not defined
 
 
-# - debug: var=drdc_scale
-# - name: Scale docker services
-#   docker_service:
-#     project_name: "{{drdc_name}}"
-#     definition: "{{drdc_definition|default(omit)}}"
-#     scale: "{{drdc_scale}}"
-#     timeout: 150
-#   tags: ['never', 'scale']
-#   when: "drdc_mode == 'compose' and scale_mode is defined"
+  # - debug: var=drdc_scale
+  # - name: Scale docker services
+  #   docker_service:
+  #     project_name: "{{drdc_name}}"
+  #     definition: "{{drdc_definition|default(omit)}}"
+  #     scale: "{{drdc_scale}}"
+  #     timeout: 150
+  #   tags: ['never', 'scale']
+  #   when: "drdc_mode == 'compose' and scale_mode is defined"
 
+- block:
 
-- name: "Building {{drdc_name}} image"
-  docker_image:
-    force: '{{drdc_force}}'
-    pull: '{{drdc_pull}}'
-    nocache: "{{drdc_nocache}}"
-    path: '{{img_source_path|default(omit)}}'
-    name: '{{drdc_image}}'
-    buildargs:
-      RELEASE: 
-  vars:
-    calc_release: "{{release_key_git|default(None) or release_key_dir|default(None) or 'latest' }}"
-  when: "drdc_mode == 'native'"
+    - name: "Pulling {{drdc_name}} image"
+      docker_image:
+        pull: yes
+        name: '{{drdc_image}}'
+      when: "drdc_pull == True"
+      
+    - name: "Building {{drdc_name}} image"
+      docker_image:
+        force: '{{ drdc_force }}'
+        pull: no
+        nocache: "{{drdc_nocache}}"
+        path: '{{ drdc_use_dir + drdc_rel_path }}'
+        name: '{{drdc_image}}'
+        buildargs:
+          RELEASE: "{{calc_release}}"
+      vars:
+        calc_release: "{{_git_result_after or _release_dir_key or 'latest' }}"
+      when: "drdc_pull == False"
 
+    - name: "Creating {{drdc_name}} container"
+      vars:
+        hostmod: "{{drdc_net_mode == 'host'}}"
+        nets: "{{ hostmod | ternary([], drdc_networks) }}"
+      docker_container:
+        name: '{{drdc_name}}'
+        hostname: '{{drdc_name}}'
+        recreate: "{{drdc_recreate!='never'}}"
+        state: "{{drdc_state}}"
+        pull: '{{drdc_pull}}'
+        auto_remove: "{{drdc_auto_remove}}"
+        labels: "{{drdc_labels}}"
+        restart: "{{drdc_restart}}"
+        detach: "{{drdc_detach}}"
+        etc_hosts: "{{drdc_hosts|default(omit)}}"
+        restart_policy: '{{drdc_restart_policy}}'
+        memory: '{{drdc_memory_limit}}'
+        image: '{{drdc_image}}'
+        volumes: '{{drdc_volumes}}'
+        purge_networks: "{{drdc_purge_networks}}"
+        network_mode: "{{drdc_net_mode}}"
+        networks: "{{nets}}"
+        ports: '{{drdc_ports}}'
+        env: '{{drdc_env}}'
+        tty: '{{drdc_tty}}'
+        interactive: '{{drdc_interactive}}'
+        command: '{{drdc_cmd|default(omit)}}'
+      when: "drdc_run_container == True"
+  when: drdc_mode == 'native'
 
-- name: "Creating {{drdc_name}} container"
-  vars:
-    hostmod: "{{drdc_net_mode == 'host'}}"
-    nets: "{{ hostmod| ternary([], drdc_networks) }}"
-  docker_container:
-    name: '{{drdc_name}}'
-    hostname: '{{drdc_name}}'
-    recreate: "{{drdc_recreate!='never'}}"
-    state: "{{drdc_state}}"
-    pull: '{{drdc_pull}}'
-    auto_remove: "{{drdc_auto_remove}}"
-    labels: "{{drdc_labels}}"
-    restart: "{{drdc_restart}}"
-    detach: "{{drdc_detach}}"
-    etc_hosts: "{{drdc_hosts|default(omit)}}"
-    restart_policy: '{{drdc_restart_policy}}'
-    memory: '{{drdc_memory_limit}}'
-    image: '{{drdc_image}}'
-    volumes: '{{drdc_volumes}}'
-    purge_networks: "{{drdc_purge_networks}}"
-    network_mode: "{{drdc_net_mode}}"
-    networks: "{{nets}}"
-    ports: '{{drdc_ports}}'
-    env: '{{drdc_env}}'
-    tty: '{{drdc_tty}}'
-    interactive: '{{drdc_interactive}}'
-    command: '{{drdc_cmd|default(omit)}}'
-  when: "drdc_run_container == True and drdc_mode == 'native'"

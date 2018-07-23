@@ -1,8 +1,12 @@
 # Container name
 drdc_name: ""
 
+drdc_tmp_dir: "/tmp/srv-{{ drdc_name }}"
+
 # [dir for build/dir with sources]
 drdc_dir: ""
+
+drdc_use_dir: "{{ drdc_dir or drdc_tmp_dir }}"
 
 # image source relative path (inside dir contents)
 drdc_rel_path: ""
@@ -12,7 +16,6 @@ drdc_cmd: ""
 
 # [git repo with images]
 drdc_repo: ""
-
 
 drdc_state: started
 
@@ -90,3 +93,5 @@ drdc_mode: native # compose
 
 # scale options: dict with key - service name, value - amount
 drdc_scale: {}
+
+drdc_pull: "{{ drdc_dir == '' and drdc_repo == '' }}"

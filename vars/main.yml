@@ -1,4 +1,5 @@
 ---
-# drdc_pull: yes
-drdc_pull: "{{not (drdc_dir is defined or drdc_repo is defined)}}"
-drdc_pullable: no
+state: {}
+
+
+
