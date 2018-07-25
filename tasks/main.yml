@@ -4,17 +4,10 @@
 
 - assert: { that: "drdc_name != ''" }
 
-
 - set_fact:
     _git_result_after: ""
     _release_dir_key: ""
     _release_key: ""
-
-- debug: var=_img_source
-- debug: var=_release_key_git
-- debug: var=_drdc_dir
-- debug: var=drdc_dir
-
 
 - name: "Creating directory for sources"
   file:
@@ -29,7 +22,7 @@
     git:
       repo: '{{drdc_repo}}'
       version: HEAD
-      force: "{{drdc_force}}"
+      force: "{{drdc_git_force}}"
       accept_hostkey: yes
       dest: '{{drdc_use_dir}}'
     register: _git_result
@@ -83,7 +76,7 @@
       
     - name: "Building {{drdc_name}} image"
       docker_image:
-        force: '{{ drdc_force }}'
+        force: yes
         pull: no
         nocache: "{{drdc_nocache}}"
         path: '{{ drdc_use_dir + drdc_rel_path }}'

@@ -67,6 +67,8 @@ drdc_auto_remove: no
 #for pulled images
 drdc_force: yes
 
+drdc_git_force: no
+
 # docker_service
 # recreate service // smart / never / always
 drdc_recreate: never
