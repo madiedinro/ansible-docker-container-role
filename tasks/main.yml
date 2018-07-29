@@ -41,31 +41,6 @@
       _release_key: "{{_dir_stat.stat.version}}"
   when: "drdc_pull == False and drdc_repo == ''"
 
-
-# - block:
-#   - name: Constructing docker services 
-#     docker_service:
-#       build: "{{only_scale|ternary(False ,drdc_force)}}"
-#       nocache: "{{drdc_nocache}}"
-#       project_name: "{{drdc_name}}"
-#       definition: "{{drdc_definition|default(omit)}}"
-#       recreate: "{{only_scale|ternary('never', drdc_recreate)}}"
-#       restarted: "{{only_scale|ternary(False, drdc_restart)}}"
-#       scale: "{{drdc_scale}}"
-#       timeout: 60
-#     when: "drdc_mode == 'compose'" # and scale_mode is not defined
-
-
-  # - debug: var=drdc_scale
-  # - name: Scale docker services
-  #   docker_service:
-  #     project_name: "{{drdc_name}}"
-  #     definition: "{{drdc_definition|default(omit)}}"
-  #     scale: "{{drdc_scale}}"
-  #     timeout: 150
-  #   tags: ['never', 'scale']
-  #   when: "drdc_mode == 'compose' and scale_mode is defined"
-
 - block:
 
     - name: "Pulling {{drdc_name}} image"
